@@ -22,7 +22,7 @@ function draw() {
       textSize(64);
       fill("white");
       textAlign(CENTER, TOP);
-      text("FINISH", 200, 200, CENTER);
+      text("FINISH", 200, 200, width);
       textSize(34);
       if (finalScore >= 0) text("Score:" + finalScore, 200, 300, width);
       else
@@ -63,15 +63,20 @@ function draw() {
   if (frameCount % 120 === 0) {
     Game.addAngryBalloon();
   }
-  if ((frameCount % 80) * (980 / width) === 0) {
+  if ((frameCount % 100) * (980 / width) === 0) {
     Game.addCloud();
   }
 }
 
 function mousePressed() {
   if (!isLooping()) {
-    loop();
-    Game.score = 0;
+    setTimeout(
+      () => {
+        loop();
+        Game.score = 0;
+      },
+      2 * 1000
+    );
   }
   Game.checkIfBalloonBurst();
 }
@@ -199,9 +204,19 @@ const music = new Audio(
   "music/music.mp3"
 );
 
-music.play();
 music.loop = true;
-music.volume = 0.1;
+music.volume = 0.3;
 
 var popSound = new Audio("music/pop.wav");
 popSound.volume = 0.3;
+
+let clicked = false;
+
+// browser blocks autoplay so you need to click anywhere first
+
+document.addEventListener("click", (event) => {
+  if (!clicked) {
+    music.play();
+    clicked = true;
+  }
+});
