@@ -1,15 +1,15 @@
 function setup(){
-    createCanvas(400, 400);
+    createCanvas(window.innerWidth - 15, window.innerHeight - 20);
     Game.addCommonBalloon()
 }
 function draw() {
 
-    background('skyblue')
+    background("skyblue")
 
     for (let balloon of Game.balloons){
 
         balloon.display();
-        balloon.move(Game.score);
+        balloon.move(Game.score)
         let finalScore = Game.score
         
 
@@ -17,16 +17,29 @@ function draw() {
             noLoop()
             Game.clouds.length = 0
             Game.balloons.length = 0
-            background(136, 220, 166);
+            background(120, 120, 120);
+            Game.score = ''
+            textSize(64);
+            fill('white');
+            textAlign(CENTER, TOP);
+            text('FINISH', 200, 200, CENTER);
+            textSize(34);
+            if (finalScore >= 0)text('Score:' + finalScore, 200, 300, width);
+            else text(`Noob?
+            Try Again!`, 200, 300,width);
+        }else if(Game.score <= -50){
+            noLoop()
+            Game.clouds.length = 0
+            Game.balloons.length = 0
+            background(120, 120, 120);
             Game.score = ''
             textSize(64);
             fill('white');
             textAlign(CENTER, CENTER);
-            text('FINISH', 200, 200);
+            text('HA! HA! HA! HA!', 200, 200, width);
             textSize(34);
+            text('Try to find a Bug?', 200, 300, width);
 
-            if (finalScore >= 0)text('Score:' + finalScore, 200, 300);
-            else text('Where my money?', 200, 300);
         }
     }
     for (let cloud of Game.clouds){
@@ -35,6 +48,7 @@ function draw() {
         cloud.move(Game.score);
     }
 
+    textAlign(CENTER,CENTER)
     textSize(32);
     fill('black');
     text(Game.score, 20, 40);
@@ -45,7 +59,7 @@ function draw() {
     if(frameCount % 120 === 0) {
         Game.addAngryBalloon()
     }
-    if(frameCount % 120 === 0) {
+    if(frameCount % 80 * (980/width) === 0) {
         Game.addCloud()
     }
 }
@@ -74,7 +88,7 @@ class Game {
     }
 
     static addCloud(){
-        let cloud = new Cloud('White', 50);
+        let cloud = new Cloud('White', 50, random(0, 100));
         this.clouds.push(cloud);
     }
 
@@ -89,9 +103,24 @@ class Game {
     }
 }
 
+function calc(width) {
+    if((1/width) > 0.01 && (1/width) < 0.2) {
+        return (1/width)*145
+    }
+     else{
+        return 150
+    }
+    }
+
 class Cloud {
-    constructor(color, size) {
-        this.x = 0;
+    constructor(color, size, isRightDirection) {
+        if(isRightDirection >50)
+        {this.speed = random(-0.001, -0.0009)
+        this.x = 0;}
+        else if (isRightDirection <= 50){
+        this.speed = random(0.001, 0.0009)
+        this.x = width;
+        }
         this.y = random(height);
         this.color = color;
         this.size = size;
@@ -107,7 +136,7 @@ class Cloud {
     }
 
     move() {
-        this.x -= -0.6
+        this.x -= this.speed * width
     }
     burst(index) {
         Game.clouds.splice(index, 1)
@@ -117,10 +146,12 @@ class Cloud {
 }
 class CommonBalloon {
     constructor(color, size) {
-        this.x = random(width);
+        
+        this.x = random(40, width - 40);
         this.y = random(height - 10, height + 50);
         this.color = color;
         this.size = size;
+        this.xstart = this.x
     }
 
     display() {
@@ -131,19 +162,14 @@ class CommonBalloon {
         line(this.x, this.y + this.size / 2, this.x, this.y + 2 * this.size);
     }
 
-    move(score) {
-        if(score < 100) {
-            this.y -= 1
-        }else if (score >= 100 && score <= 200) {
-            this.y -= 1.5
-        }else {
-            this.y -= 2
-        }
+    move(score) {   
+            this.y -= 1 + score*0.01
+            this.x = Math.sin(this.y * 0.02)*12 + this.xstart
     }
 
     burst(index) {
         Game.balloons.splice(index, 1)
-        Game.score += Math.round(5*(30/this.size))
+        Game.score += Math.round(8*(30/this.size))
     }
 }
 
